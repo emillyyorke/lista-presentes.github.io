@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lista de Presentes — Emilly faz 22 anos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --lilac: #c9b8f0;
+    --lilac-light: #e8e0fa;
+    --lilac-dark: #9b84d4;
+    --blue: #a8cdf0;
+    --blue-light: #dceeff;
+    --pink: #f0b8d4;
+    --pink-light: #fce8f2;
+    --pink-dark: #d484a8;
+    --cream: #faf8ff;
+    --text: #2d2640;
+    --text-muted: #7a6e90;
+    --white: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ─── CURSOR ─── */
+  body { cursor: none; }
+  #cursor {
+    width: 12px; height: 12px;
+    background: var(--lilac-dark);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease, background 0.2s;
+    mix-blend-mode: multiply;
+  }
+  #cursor.big { transform: scale(3.5); background: var(--pink); }
+
+  /* ─── NOISE TEXTURE ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  /* ─── HERO ─── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(160deg, var(--lilac-light) 0%, var(--cream) 40%, var(--pink-light) 100%);
+  }
+
+  .hero-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  .blob-1 { width: 500px; height: 500px; background: var(--lilac); top: -150px; left: -150px; animation: float1 8s ease-in-out infinite; }
+  .blob-2 { width: 400px; height: 400px; background: var(--pink); bottom: -100px; right: -100px; animation: float2 10s ease-in-out infinite; }
+  .blob-3 { width: 300px; height: 300px; background: var(--blue); top: 50%; left: 60%; animation: float3 7s ease-in-out infinite; }
+
+  @keyframes float1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(30px,20px) scale(1.05)} }
+  @keyframes float2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-25px,-15px) scale(1.08)} }
+  @keyframes float3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(15px,25px)} }
+
+  .hero-content { position: relative; z-index: 1; max-width: 760px; }
+
+  .hero-eyebrow {
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--lilac-dark);
+    font-weight: 500;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: 1.1;
+    color: var(--text);
+    margin: 0.5rem 0 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.4s forwards;
+  }
+  .hero-title em { color: var(--lilac-dark); font-style: italic; }
+
+  .hero-subtitle {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    max-width: 520px;
+    margin: 0 auto 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.6s forwards;
+  }
+
+  /* ─── COUNTDOWN ─── */
+  .countdown-box {
+    display: inline-flex;
+    gap: 1.5rem;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(201,184,240,0.4);
+    border-radius: 20px;
+    padding: 1.5rem 2.5rem;
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.9s ease 0.8s forwards;
+  }
+  .countdown-unit { text-align: center; }
+  .countdown-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--lilac-dark);
+    display: block;
+    line-height: 1;
+  }
+  .countdown-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+  .countdown-sep { font-size: 2rem; color: var(--lilac); align-self: flex-start; padding-top: 0.3rem; }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    animation: fadeIn 1s ease 1.5s forwards;
+  }
+  .scroll-hint span { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .scroll-arrow { width: 24px; height: 24px; border-right: 2px solid var(--lilac-dark); border-bottom: 2px solid var(--lilac-dark); transform: rotate(45deg); animation: bounce 2s ease infinite; }
+  @keyframes bounce { 0%,100%{transform:rotate(45deg) translateY(0)} 50%{transform:rotate(45deg) translateY(6px)} }
+
+  /* ─── PHOTO GALLERY ─── */
+  #gallery {
+    padding: 5rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .section-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--lilac-dark);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+  }
+  .section-desc {
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 520px;
+    margin-bottom: 3rem;
+  }
+
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto auto;
+    gap: 16px;
+  }
+  .photo-card {
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    background: var(--lilac-light);
+    aspect-ratio: 4/5;
+    transition: transform 0.4s cubic-bezier(.22,.68,0,1.2);
+  }
+  .photo-card:hover { transform: scale(1.03) rotate(-1deg); }
+  .photo-card:nth-child(2) { aspect-ratio: 4/5; transform: rotate(1.5deg); }
+  .photo-card:nth-child(2):hover { transform: scale(1.03) rotate(0.5deg); }
+  .photo-card:nth-child(4) { aspect-ratio: 1/1; }
+  .photo-card:nth-child(5) { aspect-ratio: 4/3; }
+  .photo-card:nth-child(6) { aspect-ratio: 1/1; }
+  .photo-card img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-label {
+    position: absolute;
+    bottom: 12px; left: 12px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  /* ─── TIER SECTIONS ─── */
+  .tier-section {
+    padding: 5rem 2rem;
+    position: relative;
+    z-index: 1;
+  }
+  .tier-section:nth-child(odd) { background: rgba(255,255,255,0.5); }
+
+  .tier-inner { max-width: 1100px; margin: 0 auto; }
+
+  .tier-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .tier-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  .badge-green { background: #d4f0e0; color: #2a7a50; }
+  .badge-blue { background: var(--blue-light); color: #2a5a8a; }
+  .badge-pink { background: var(--pink-light); color: var(--pink-dark); }
+
+  .tier-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+    line-height: 1.2;
+  }
+  .tier-note { font-size: 0.9rem; color: var(--text-muted); font-style: italic; max-width: 300px; text-align: right; }
+
+  /* ─── GIFT CARDS ─── */
+  .gifts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  .gift-card {
+    background: var(--white);
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1.5px solid rgba(201,184,240,0.25);
+    transition: transform 0.35s cubic-bezier(.22,.68,0,1.2), box-shadow 0.35s ease;
+    position: relative;
+  }
+  .gift-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(155,132,212,0.15);
+  }
+  .gift-card.claimed { border-color: rgba(100,200,150,0.4); }
+
+  .gift-img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    background: var(--lilac-light);
+    display: block;
+  }
+  .gift-img-placeholder {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: linear-gradient(135deg, var(--lilac-light), var(--blue-light));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+  }
+
+  .gift-body { padding: 1.25rem 1.5rem 1.5rem; }
+
+  .gift-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    line-height: 1.3;
+  }
+  .gift-desc {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  .gift-price {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--lilac-dark);
+    margin-bottom: 1rem;
+  }
+
+  .gift-footer {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-buy {
+    flex: 1;
+    padding: 10px 16px;
+    background: var(--text);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-block;
+  }
+  .btn-buy:hover { background: var(--lilac-dark); transform: scale(1.02); }
+
+  .btn-claim {
+    padding: 10px 16px;
+    background: transparent;
+    border: 1.5px solid var(--lilac);
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--lilac-dark);
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    white-space: nowrap;
+  }
+  .btn-claim:hover { background: var(--lilac-light); }
+  .btn-claim.claimed-btn {
+    background: #d4f0e0;
+    border-color: #2a7a50;
+    color: #2a7a50;
+  }
+
+  .claimed-banner {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    color: #2a7a50;
+    font-weight: 600;
+  }
+
+  /* ─── CLAIM MODAL ─── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(45,38,64,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 2.5rem;
+    max-width: 440px;
+    width: 100%;
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.35s cubic-bezier(.22,.68,0,1.2);
+  }
+  .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+
+  .modal h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .modal p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.5rem; }
+  .modal input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--lilac);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 1rem;
+  }
+  .modal input:focus { border-color: var(--lilac-dark); }
+  .modal-btns { display: flex; gap: 10px; }
+  .modal-cancel {
+    flex: 1;
+    padding: 12px;
+    background: transparent;
+    border: 1.5px solid rgba(201,184,240,0.4);
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .modal-cancel:hover { background: var(--lilac-light); }
+  .modal-confirm {
+    flex: 2;
+    padding: 12px;
+    background: var(--lilac-dark);
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .modal-confirm:hover { background: var(--text); transform: scale(1.02); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    text-align: center;
+    padding: 4rem 2rem;
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid rgba(201,184,240,0.2);
+  }
+  footer p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.8; }
+  footer strong { color: var(--lilac-dark); }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(.22,.68,0,1.2);
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    .photo-grid { grid-template-columns: repeat(2,1fr); }
+    .photo-card:nth-child(n) { aspect-ratio: 1/1; transform: none!important; }
+    .photo-card:nth-child(5),
+    .photo-card:nth-child(6) { display: none; }
+    .tier-header { flex-direction: column; align-items: flex-start; }
+    .tier-note { text-align: left; }
+    .countdown-box { gap: 1rem; padding: 1.25rem 1.5rem; }
+    body { cursor: auto; }
+    #cursor { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+
+<!-- ─── HERO ─── -->
+<section id="hero">
+  <div class="hero-blob blob-1"></div>
+  <div class="hero-blob blob-2"></div>
+  <div class="hero-blob blob-3"></div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">14 de junho · uma data muito importante</p>
+    <h1 class="hero-title">
+      Emilly faz<br><em>22 anos</em>
+    </h1>
+    <p class="hero-subtitle">
+      Sim, isso é uma lista de presentes. Não, não é constrangedor.
+      É, na verdade, um gesto de bondade da minha parte —
+      assim você não precisa adivinhar o que comprar.
+    </p>
+
+    <div class="countdown-box" id="countdown-box">
+      <div class="countdown-unit">
+        <span class="countdown-num" id="cd-days">--</span>
+        <span class="countdown-label">dias</span>
+      </div>
+      <span class="countdown-sep">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-num" id="cd-hours">--</span>
+        <span class="countdown-label">horas</span>
+      </div>
+      <span class="countdown-sep">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-num" id="cd-mins">--</span>
+        <span class="countdown-label">minutos</span>
+      </div>
+      <span class="countdown-sep">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-num" id="cd-secs">--</span>
+        <span class="countdown-label">segundos</span>
+      </div>
+    </div>
+
+    <p style="font-size: 0.85rem; color: var(--text-muted); opacity: 0; animation: fadeIn 1s ease 1.2s forwards;">
+      faltando este tempo pra você me fazer feliz ↑
+    </p>
+  </div>
+
+  <div class="scroll-hint">
+    <span>ver lista</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- ─── GALLERY ─── -->
+<section id="gallery">
+  <div class="reveal">
+    <p class="section-label">a aniversariante</p>
+    <h2 class="section-title">Um breve dossiê<br>sobre mim</h2>
+    <p class="section-desc">
+      Para contextualizar quem você está presenteando.
+      As fotos de criança estão aqui para provar que sempre tive bom gosto.
+    </p>
+  </div>
+
+  <div class="photo-grid reveal reveal-delay-1">
+    <!-- SUBSTITUA os src pelas suas fotos. Sugestão: foto-atual-1.jpg, foto-atual-2.jpg, etc. -->
+    <div class="photo-card">
+      <div class="gift-img-placeholder" style="aspect-ratio:4/5; font-size:4rem;">📸</div>
+      <span class="photo-label">atualmente</span>
+    </div>
+    <div class="photo-card">
+      <div class="gift-img-placeholder" style="aspect-ratio:4/5; font-size:4rem;">✨</div>
+      <span class="photo-label">também atualmente</span>
+    </div>
+    <div class="photo-card">
+      <div class="gift-img-placeholder" style="aspect-ratio:4/5; font-size:4rem;">🧸</div>
+      <span class="photo-label">era pequenininha</span>
+    </div>
+    <div class="photo-card">
+      <div class="gift-img-placeholder" style="aspect-ratio:1/1; font-size:4rem;">🎀</div>
+      <span class="photo-label">infância</span>
+    </div>
+    <div class="photo-card">
+      <div class="gift-img-placeholder" style="aspect-ratio:4/3; font-size:4rem;">🌸</div>
+      <span class="photo-label">mais atualmente</span>
+    </div>
+    <div class="photo-card">
+      <div class="gift-img-placeholder" style="aspect-ratio:1/1; font-size:4rem;">👶</div>
+      <span class="photo-label">muito criança</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TIER 1: ACESSÍVEL ─── -->
+<section class="tier-section" id="tier-1">
+  <div class="tier-inner">
+    <div class="tier-header reveal">
+      <div>
+        <div class="tier-badge badge-green">💚 nível: modéstia total</div>
+        <h2 class="tier-title">Presentes Acessíveis</h2>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-top:0.5rem;">até ~R$ 150</p>
+      </div>
+      <p class="tier-note">opções para quem me ama muito, mas o PIX está baixo</p>
+    </div>
+
+    <div class="gifts-grid" id="gifts-tier-1"></div>
+  </div>
+</section>
+
+<!-- ─── TIER 2: MÉDIO ─── -->
+<section class="tier-section" id="tier-2">
+  <div class="tier-inner">
+    <div class="tier-header reveal">
+      <div>
+        <div class="tier-badge badge-blue">💙 nível: sendo razoável</div>
+        <h2 class="tier-title">O Meio-Termo Elegante</h2>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-top:0.5rem;">R$ 150 – R$ 400</p>
+      </div>
+      <p class="tier-note">para quem me considera mais que um conhecidos</p>
+    </div>
+
+    <div class="gifts-grid" id="gifts-tier-2"></div>
+  </div>
+</section>
+
+<!-- ─── TIER 3: AMBICIOSO ─── -->
+<section class="tier-section" id="tier-3">
+  <div class="tier-inner">
+    <div class="tier-header reveal">
+      <div>
+        <div class="tier-badge badge-pink">🌸 nível: sonho grande</div>
+        <h2 class="tier-title">Os Desejos Ambiciosos</h2>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-top:0.5rem;">R$ 400+</p>
+      </div>
+      <p class="tier-note">esta seção existe por princípio. respeito quem chegar até aqui.</p>
+    </div>
+
+    <div class="gifts-grid" id="gifts-tier-3"></div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <p style="font-family:'Playfair Display',serif; font-size:1.5rem; margin-bottom:1rem;">
+    Muito obrigada 🎂
+  </p>
+  <p>
+    Qualquer presente é recebido com amor e uma foto de agradecimento.<br>
+    <strong>Sua presença também conta.</strong> Mas o presente conta mais.
+  </p>
+  <p style="margin-top:1.5rem; font-size:0.8rem; opacity:0.6;">
+    feito com carinho · Emilly Yorke · 2026
+  </p>
+</footer>
+
+<!-- ─── CLAIM MODAL ─── -->
+<div class="modal-overlay" id="claimModal">
+  <div class="modal">
+    <h3 id="modal-gift-name">Presente</h3>
+    <p id="modal-desc">Que legal que você quer dar esse presente! Coloca seu nome abaixo pra eu não ganhar dois iguais (seria até agradável, mas seria desperdiçar seu dinheiro).</p>
+    <input type="text" id="modal-name-input" placeholder="seu nome..." maxlength="50">
+    <div class="modal-btns">
+      <button class="modal-cancel" id="modal-cancel">cancelar</button>
+      <button class="modal-confirm" id="modal-confirm">confirmar presente 🎁</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────
+const GIFTS = [
+  // TIER 1 — ACESSÍVEL
+  {
+    id: 'g1', tier: 1,
+    emoji: '🕯️',
+    name: 'Vela Aromática',
+    desc: 'Qualquer vela perfumada de qualidade. Vanilla, lavanda, madeira — sou fácil de agradar nesse quesito.',
+    price: 'R$ 50 – 100',
+    link: 'https://www.amazon.com.br', // substitua pelo link real
+  },
+  {
+    id: 'g2', tier: 1,
+    emoji: '📚',
+    name: 'Livro',
+    desc: 'Um livro de ficção científica, computação ou poesia. A descrição genérica é proposital — surpresas são bem-vindas.',
+    price: 'R$ 40 – 80',
+    link: 'https://www.amazon.com.br', // substitua
+  },
+  {
+    id: 'g3', tier: 1,
+    emoji: '☕',
+    name: 'Kit de Café Especial',
+    desc: 'Café de origem única, moído na hora. Sim, sou esse tipo de pessoa.',
+    price: 'R$ 60 – 120',
+    link: 'https://www.amazon.com.br', // substitua
+  },
+  {
+    id: 'g4', tier: 1,
+    emoji: '🎨',
+    name: 'Caderno de Desenho + Canetas',
+    desc: 'Um bom caderno dot grid ou de esboços, com canetas coloridas. Para quando eu fingir que sou criativa.',
+    price: 'R$ 80 – 150',
+    link: 'https://www.amazon.com.br', // substitua
+  },
+
+  // TIER 2 — MÉDIO
+  {
+    id: 'g5', tier: 2,
+    emoji: '🎧',
+    name: 'Fone de Ouvido',
+    desc: 'Um bom fone com cancelamento de ruído para me ignorar o mundo com dignidade.',
+    price: 'R$ 150 – 300',
+    link: 'https://www.amazon.com.br', // substitua
+  },
+  {
+    id: 'g6', tier: 2,
+    emoji: '💜',
+    name: 'Cuidados com a Pele',
+    desc: 'Kit de skincare de qualidade. Hidratante, sérum, protetor solar. A lista de ingredientes que eu não entendo mas confio.',
+    price: 'R$ 150 – 350',
+    link: 'https://www.amazon.com.br', // substitua
+  },
+  {
+    id: 'g7', tier: 2,
+    emoji: '🌿',
+    name: 'Planta para o Quarto',
+    desc: 'Uma planta bonita e que sobreviva com atenção intermitente. Pothos ou samambaia, de preferência.',
+    price: 'R$ 100 – 250',
+    link: 'https://www.amazon.com.br', // substitua
+  },
+  {
+    id: 'g8', tier: 2,
+    emoji: '🍽️',
+    name: 'Jantar em Restaurante',
+    desc: 'Me leve para jantar. Conta como presente e como qualidade de tempo. Muito eficiente.',
+    price: 'R$ 150 – 400',
+    link: '#', // sem link necessário
+  },
+
+  // TIER 3 — AMBICIOSO
+  {
+    id: 'g9', tier: 3,
+    emoji: '💻',
+    name: 'SSD Externo',
+    desc: 'Um SSD externo rápido de 1TB. Para guardar meu TCC e todos os meus arrependimentos em alta velocidade.',
+    price: 'R$ 400 – 600',
+    link: 'https://www.amazon.com.br', // substitua
+  },
+  {
+    id: 'g10', tier: 3,
+    emoji: '📷',
+    name: 'Câmera Analógica',
+    desc: 'Uma câmera analógica boa, com filmes inclusos. Toda desenvolvida em computação quer ser fotógrafa no fundo.',
+    price: 'R$ 500 – 900',
+    link: 'https://www.amazon.com.br', // substitua
+  },
+  {
+    id: 'g11', tier: 3,
+    emoji: '✈️',
+    name: 'Passagem de Avião',
+    desc: 'Para qualquer lugar que não seja aqui. Destino negociável. A intenção já resolve.',
+    price: 'R$ 500+',
+    link: 'https://www.google.com/travel/flights', // substitua
+  },
+];
+
+// ─── STORAGE ─────────────────────────────────────────────────
+const STORAGE_KEY = 'emilly_birthday_claims_2026';
+
+async function loadClaims() {
+  try {
+    const result = await window.storage.get(STORAGE_KEY, true);
+    return result ? JSON.parse(result.value) : {};
+  } catch { return {}; }
+}
+
+async function saveClaim(giftId, claimerName) {
+  const claims = await loadClaims();
+  claims[giftId] = claimerName;
+  await window.storage.set(STORAGE_KEY, JSON.stringify(claims), true);
+}
+
+async function removeClaim(giftId) {
+  const claims = await loadClaims();
+  delete claims[giftId];
+  await window.storage.set(STORAGE_KEY, JSON.stringify(claims), true);
+}
+
+// ─── RENDER ──────────────────────────────────────────────────
+function createGiftCard(gift, claims) {
+  const claimer = claims[gift.id];
+  const isClaimed = !!claimer;
+
+  const card = document.createElement('div');
+  card.className = `gift-card reveal ${isClaimed ? 'claimed' : ''}`;
+  card.dataset.giftId = gift.id;
+
+  card.innerHTML = `
+    ${isClaimed ? `<div class="claimed-banner">✓ ${claimer}</div>` : ''}
+    <div class="gift-img-placeholder">${gift.emoji}</div>
+    <div class="gift-body">
+      <div class="gift-name">${gift.name}</div>
+      <div class="gift-desc">${gift.desc}</div>
+      <div class="gift-price">${gift.price}</div>
+      <div class="gift-footer">
+        <a href="${gift.link}" target="_blank" class="btn-buy">ver onde comprar ↗</a>
+        <button class="btn-claim ${isClaimed ? 'claimed-btn' : ''}" data-gift-id="${gift.id}">
+          ${isClaimed ? '✓ reservado' : 'vou dar este'}
+        </button>
+      </div>
+    </div>
+  `;
+
+  return card;
+}
+
+async function renderGifts() {
+  const claims = await loadClaims();
+  [1, 2, 3].forEach(tier => {
+    const container = document.getElementById(`gifts-tier-${tier}`);
+    container.innerHTML = '';
+    GIFTS.filter(g => g.tier === tier).forEach((gift, i) => {
+      const card = createGiftCard(gift, claims);
+      card.style.transitionDelay = `${i * 0.08}s`;
+      container.appendChild(card);
+    });
+  });
+  observeReveal();
+  attachClaimListeners();
+}
+
+// ─── CLAIM MODAL ─────────────────────────────────────────────
+let activeGiftId = null;
+const modal = document.getElementById('claimModal');
+const nameInput = document.getElementById('modal-name-input');
+
+function openModal(giftId) {
+  const gift = GIFTS.find(g => g.id === giftId);
+  activeGiftId = giftId;
+  document.getElementById('modal-gift-name').textContent = gift.name;
+  nameInput.value = '';
+  modal.classList.add('open');
+  setTimeout(() => nameInput.focus(), 200);
+}
+
+function closeModal() {
+  modal.classList.remove('open');
+  activeGiftId = null;
+}
+
+document.getElementById('modal-cancel').addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+document.getElementById('modal-confirm').addEventListener('click', async () => {
+  const name = nameInput.value.trim();
+  if (!name) { nameInput.style.borderColor = 'var(--pink-dark)'; return; }
+  await saveClaim(activeGiftId, name);
+  closeModal();
+  await renderGifts();
+});
+
+nameInput.addEventListener('keydown', e => {
+  nameInput.style.borderColor = '';
+  if (e.key === 'Enter') document.getElementById('modal-confirm').click();
+});
+
+function attachClaimListeners() {
+  document.querySelectorAll('.btn-claim').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const giftId = btn.dataset.giftId;
+      const claims = await loadClaims();
+      if (claims[giftId]) {
+        if (confirm(`${claims[giftId]} reservou este presente. Quer cancelar a reserva?`)) {
+          await removeClaim(giftId);
+          await renderGifts();
+        }
+        return;
+      }
+      openModal(giftId);
+    });
+  });
+}
+
+// ─── COUNTDOWN ───────────────────────────────────────────────
+function updateCountdown() {
+  const now = new Date();
+  const bday = new Date(now.getFullYear(), 5, 14, 0, 0, 0); // month 5 = June
+  if (now > bday) bday.setFullYear(bday.getFullYear() + 1);
+  const diff = bday - now;
+
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+
+  document.getElementById('cd-days').textContent = String(days).padStart(2, '0');
+  document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
+  document.getElementById('cd-mins').textContent = String(mins).padStart(2, '0');
+  document.getElementById('cd-secs').textContent = String(secs).padStart(2, '0');
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+// ─── SCROLL REVEAL ────────────────────────────────────────────
+function observeReveal() {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}
+observeReveal();
+
+// ─── CUSTOM CURSOR ────────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+if (cursor) {
+  let mx = 0, my = 0, cx = 0, cy = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animCursor() {
+    cx += (mx - cx) * 0.15;
+    cy += (my - cy) * 0.15;
+    cursor.style.left = cx + 'px';
+    cursor.style.top = cy + 'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────────
+renderGifts();
+</script>
+</body>
+</html>
